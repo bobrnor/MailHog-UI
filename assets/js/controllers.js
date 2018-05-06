@@ -59,6 +59,9 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
       }
   }
 
+  $scope.namespace = ''
+  $scope.namespaces = []
+
   $scope.startMessages = 0
   $scope.countMessages = 0
   $scope.totalMessages = 0
@@ -72,6 +75,44 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
   $scope.smtpmech = "NONE"
   $scope.selectedOutgoingSMTP = ""
   $scope.saveSMTPServer = false;
+
+    $(".dropdown-menu").on("click", "a", function(e){
+        e.preventDefault();
+        $scope.namespace = $(this).text();
+
+        $('#dropdownMenu').html(' ' + $scope.namespace + ' ' + '<span class="caret"></span>')
+        $scope.refresh()
+    })
+
+  $scope.getNamespaces = function() {
+      var url = $scope.host + 'api/v3/namespaces'
+      $http.get(url).success(function(data) {
+          $scope.namespaces = data
+          if ($scope.namespaces.length > 0) {
+            $scope.namespace = $scope.namespaces[0]
+          } else {
+              $scope.namespace = ''
+          }
+
+          $scope.renderNamespaces()
+          $scope.refresh()
+      }).error(function() {
+          $scope.namespaces = []
+          $scope.namespace = ''
+
+          $scope.renderNamespaces()
+          $scope.refresh()
+      })
+  }
+
+  $scope.renderNamespaces = function() {
+    $('.dropdown-menu').html('')
+    $.each($scope.namespaces, function (k, v) {
+        $('.dropdown-menu').append('<li><a href="#">' + v + '</a></li>')
+    })
+
+    $('#dropdownMenu').html(' ' + $scope.namespace + ' ' + '<span class="caret"></span>')
+  }
 
   $scope.getJim = function() {
     var url = $scope.host + 'api/v2/jim'
@@ -274,7 +315,7 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
       return $scope.refreshSearch();
     }
     var e = $scope.startEvent("Loading messages", null, "glyphicon-download");
-    var url = $scope.host + 'api/v2/messages'
+    var url = $scope.host + 'api/v3/' + $.trim($scope.namespace) + '/messages'
     if($scope.startIndex > 0) {
       url += "?start=" + $scope.startIndex + "&limit=" + $scope.itemsPerPage;
     } else {
@@ -604,4 +645,6 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
       e.done();
   	});
   }
+
+  $scope.getNamespaces()
 });

@@ -45,13 +45,13 @@
             </div>
           </form>
 
-          <select ng-model="namespace" ng-change="showNamespace(namespace)">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="75">75</option>
-              <option value="100">100</option>
-          </select>
+          <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle navbar-left" type="button" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+              </ul>
+          </div>
 
           <ul class="nav navbar-nav navbar-right">
             <li>

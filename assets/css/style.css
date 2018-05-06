@@ -160,3 +160,12 @@
 .mime-part {
   padding: 10px;
 }
+
+.dropdown-menu {
+  top: 44px;
+  left: 514px;
+}
+
+.dropdown-toggle {
+  margin-top: 8px;
+}
