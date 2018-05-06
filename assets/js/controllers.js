@@ -81,6 +81,8 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
         $scope.namespace = $(this).text();
 
         $('#dropdownMenu').html(' ' + $scope.namespace + ' ' + '<span class="caret"></span>')
+        $scope.closeStream()
+        $scope.openStream()
         $scope.refresh()
     })
 
@@ -94,12 +96,16 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
               $scope.namespace = ''
           }
 
+          $scope.closeStream()
+          $scope.openStream()
           $scope.renderNamespaces()
           $scope.refresh()
       }).error(function() {
           $scope.namespaces = []
           $scope.namespace = ''
 
+          $scope.closeStream()
+          $scope.openStream()
           $scope.renderNamespaces()
           $scope.refresh()
       })
@@ -166,7 +172,7 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
   $scope.openStream = function() {
     var host = $scope.host.replace(/^http/, 'ws') ||
                (location.protocol.replace(/^http/, 'ws') + '//' + location.hostname + (location.port ? ':' + location.port : '') + location.pathname);
-    $scope.source = new WebSocket(host + 'api/v2/websocket');
+    $scope.source = new WebSocket(host + 'api/v3/' + $.trim($scope.namespace) + '/websocket');
     $scope.source.addEventListener('message', function(e) {
       $scope.$apply(function() {
         $scope.totalMessages++;
@@ -364,7 +370,7 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
   }
 
   $scope.refreshSearch = function() {
-    var url = $scope.host + 'api/v2/search?kind=' + $scope.searchKind + '&query=' + $scope.searchedText;
+    var url = $scope.host + 'api/v3/' + $.trim($scope.namespace) + '/search?kind=' + $scope.searchKind + '&query=' + $scope.searchedText;
     if($scope.startIndex > 0) {
       url += "&start=" + $scope.startIndex;
     }
@@ -630,7 +636,7 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
   $scope.deleteAllConfirm = function() {
   	$('#confirm-delete-all').modal('hide');
     var e = $scope.startEvent("Deleting all messages", null, "glyphicon-remove-circle");
-  	$http.delete($scope.host + 'api/v1/messages').success(function() {
+  	$http.delete($scope.host + 'api/v3/' + $.trim($scope.namespace) + '/messages').success(function() {
   		$scope.refresh();
   		$scope.preview = null;
       e.done()
@@ -639,7 +645,7 @@ mailhogApp.controller('MailCtrl', function ($scope, $http, $sce, $timeout) {
 
   $scope.deleteOne = function(message) {
     var e = $scope.startEvent("Deleting message", message.ID, "glyphicon-remove");
-  	$http.delete($scope.host + 'api/v1/messages/' + message.ID).success(function() {
+  	$http.delete($scope.host + 'api/v3/' + $.trim($scope.namespace) + '/messages/' + message.ID).success(function() {
   		if($scope.preview._id == message._id) $scope.preview = null;
   		$scope.refresh();
       e.done();
